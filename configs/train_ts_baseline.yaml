@@ -1,0 +1,97 @@
+# Baseline configuration for time-series experiments.
+#
+# This file uses "profiles": top-level keys ("dev", "prod") correspond
+# to environments. The ml_tabular.config module will select one based on:
+#   - the --env CLI argument, or
+#   - the ML_TEMPLATE_ENV environment variable (default: "dev").
+#
+# The common sections (env, log_level, experiment_name, paths, training)
+# match AppConfig exactly, so they work seamlessly with ml_tabular.config.
+#
+# The additional "time_series" section is intended to be consumed by
+# time-series-specific training scripts (e.g., train_ts_xxx.py). AppConfig
+# will safely ignore these extra keys, but your TS script can parse them
+# from the YAML (or from cfg.to_dict()) as needed.
+
+dev:
+  env: "dev"
+  log_level: "DEBUG"
+  experiment_name: "ts_mlp_baseline_dev"
+
+  paths:
+    # Base directory for resolving other paths. Typically repo root.
+    base_dir: "."
+    # Where raw/processed data lives. A future train_ts_*.py script can
+    # resolve relative CSV paths against data_dir.
+    data_dir: "data"
+    raw_dir: "data/raw"
+    processed_dir: "data/processed"
+    models_dir: "models"
+
+  training:
+    # Random seed used for sklearn train_test_split (if you use it for
+    # validation splits) and passed into the PyTorch TrainingConfig in
+    # your TS training script.
+    random_seed: 42
+
+    # Fraction of data reserved for validation. A TS script might use
+    # this as the proportion of the *tail* of each series for validation.
+    test_size: 0.2
+
+    # These are generic training-related knobs from AppConfig; they are not
+    # directly consumed by any current TS script, but remain available for
+    # classical baselines or future extensions.
+    n_estimators: 100
+    learning_rate: 0.1
+
+  time_series:
+    # Column names and structure
+    datetime_column: "timestamp"     # name of the datetime index column
+    target_column: "target"          # univariate target to forecast
+    group_column: null               # optional ID column for multiple series (e.g. "store_id")
+
+    # Frequency & windowing (for feature engineering and sequence datasets)
+    freq: "D"                        # nominal frequency: "D", "H", etc. (optional hint)
+    input_window: 30                 # number of past time steps per input window
+    prediction_horizon: 7            # how many steps ahead to predict (e.g. 7-day forecast)
+
+    # Data handling options
+    max_series_length: null          # optional cap on series length (e.g. 365), null = no cap
+    normalize_per_series: true       # whether to normalize each series individually (z-score, etc.)
+
+
+prod:
+  env: "prod"
+  log_level: "INFO"
+  experiment_name: "ts_mlp_baseline"
+
+  paths:
+    base_dir: "."
+    data_dir: "data"
+    raw_dir: "data/raw"
+    processed_dir: "data/processed"
+    models_dir: "models"
+
+  training:
+    # Same seed for reproducibility across environments.
+    random_seed: 42
+
+    # Validation split configuration; you can tune this independently of dev
+    # if production experiments should use more/less history for validation.
+    test_size: 0.2
+
+    # Example: more conservative defaults for production-like runs.
+    n_estimators: 200
+    learning_rate: 0.05
+
+  time_series:
+    datetime_column: "timestamp"
+    target_column: "target"
+    group_column: null
+
+    freq: "D"
+    input_window: 60          # longer history window for more robust production models
+    prediction_horizon: 14    # e.g. 14-day ahead forecast in prod-like runs
+
+    max_series_length: null
+    normalize_per_series: true

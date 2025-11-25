@@ -1,0 +1,60 @@
+# Baseline configuration for tabular MLP experiments.
+#
+# This file uses "profiles": top-level keys ("dev", "prod") correspond
+# to environments. The ml_tabular.config module will select one based on:
+#   - the --env CLI argument, or
+#   - the ML_TEMPLATE_ENV environment variable (default: "dev").
+
+dev:
+  env: "dev"
+  log_level: "DEBUG"
+  experiment_name: "tabular_mlp_baseline_dev"
+
+  paths:
+    # Base directory for resolving other paths. Typically repo root.
+    base_dir: "."
+    # Where raw/processed data lives. train_tabular_mlp.py will resolve
+    # relative CSV paths against data_dir.
+    data_dir: "data"
+    raw_dir: "data/raw"
+    processed_dir: "data/processed"
+    models_dir: "models"
+
+  training:
+    # Random seed used for sklearn train_test_split and passed into the
+    # PyTorch TrainingConfig via train_tabular_mlp.py.
+    random_seed: 42
+
+    # Fraction of data used as validation set in train_tabular_mlp.py.
+    test_size: 0.2
+
+    # These are generic training-related knobs from AppConfig; they are not
+    # currently consumed by the MLP training script directly, but remain
+    # available for classical ML baselines or future extensions.
+    n_estimators: 100
+    learning_rate: 0.1
+
+
+prod:
+  env: "prod"
+  log_level: "INFO"
+  experiment_name: "tabular_mlp_baseline"
+
+  paths:
+    base_dir: "."
+    data_dir: "data"
+    raw_dir: "data/raw"
+    processed_dir: "data/processed"
+    models_dir: "models"
+
+  training:
+    # Use the same seed for reproducibility across environments.
+    random_seed: 42
+
+    # Slightly different split if desired; you can keep this equal to dev
+    # if you prefer consistency.
+    test_size: 0.2
+
+    # Example: more conservative hyperparams for production-like runs.
+    n_estimators: 200
+    learning_rate: 0.05

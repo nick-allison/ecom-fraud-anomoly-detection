@@ -1,0 +1,128 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ml-tabular-structured-template"
+version = "0.1.0"
+description = "Template for structured (tabular + time-series) deep-learning projects with modern tooling."
+readme = "README.md"
+requires-python = ">=3.10,<3.13"
+license = "MIT"
+license-files = ["LICENSE"]
+
+authors = [
+  { name = "Your Name", email = "you@example.com" }
+]
+
+dependencies = [
+  "numpy>=1.24",
+  "pandas>=2.0",
+  "scikit-learn>=1.4",
+  "torch>=2.2",
+  "pyyaml>=6.0",
+  "pydantic>=2.5",
+  "pydantic-settings>=2.0",
+  "typer[all]>=0.12",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=7.0",
+  "pytest-cov>=4.0",
+  "mypy>=1.10",
+  "ruff>=0.6.0",
+  "pre-commit>=3.5",
+  "jupyter>=1.0",
+  "ipykernel>=6.0",
+]
+
+docs = [
+  "mkdocs>=1.5",
+  "mkdocs-material>=9.0",
+]
+
+mlops = [
+  "mlflow>=2.0",
+  "kaggle>=1.6.0",
+]
+
+validation = [
+  "pandera>=0.18",
+]
+
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "License :: OSI Approved :: MIT License",
+  "Framework :: PyTorch",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Scientific/Engineering :: Information Analysis",
+]
+
+[project.urls]
+Homepage = "https://github.com/your-username/ml-tabular-structured-template"
+Documentation = "https://github.com/your-username/ml-tabular-structured-template/tree/main/docs"
+Portfolio = "https://sites.google.com/view/nicholas-allison/home"
+
+[project.scripts]
+ml-tabular = "ml_tabular.cli:app"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["ml_tabular*"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+src = ["src", "tests"]
+extend-exclude = [
+  "data/",
+  "models/",
+  ".venv/",
+]
+
+[tool.ruff.lint]
+select = [
+  "E",
+  "F",
+  "B",
+  "I",
+  "UP",
+  "SIM",
+  "G",
+]
+ignore = [
+  "E203",
+  "E501",
+]
+
+[tool.ruff.lint.per-file-ignores]
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.mypy]
+python_version = "3.10"
+packages = ["ml_tabular"]
+ignore_missing_imports = true
+strict_optional = true
+disallow_untyped_defs = true
+check_untyped_defs = true
+follow_imports = "silent"
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["tests"]
+addopts = "-ra --cov=ml_tabular --cov-report=term-missing"
+markers = [
+  "slow: tests that take a long time to run",
+  "integration: tests that hit external services or span multiple components",
+]
